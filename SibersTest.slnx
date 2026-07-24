@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SibersTest.API/SibersTest.API.csproj" />
+    <Project Path="src/SibersTest.Application/SibersTest.Application.csproj" />
+    <Project Path="src/SibersTest.Data/SibersTest.Data.csproj" />
+    <Project Path="src/SibersTest.Domain/SibersTest.Domain.csproj" />
+  </Folder>
+</Solution>
