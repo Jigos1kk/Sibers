@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace SibersTest.Application.DTOs
 {
-    public class CreateProjectRequestDto
+    public class ProjectRequestDto
     {
         public string ProjectName { get; set; } = string.Empty;
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public int Priority { get; set; }
-        public int CustomerCompanyId { get; set; }
-        public int ContractorCompanyId { get; set; }
+        public string CustomerCompanyName { get; set; } = string.Empty;
+        public string ContractorCompanyName { get; set; } = string.Empty;
 
         public int ManagerId { get; set; }
         
