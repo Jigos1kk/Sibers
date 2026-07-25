@@ -19,6 +19,8 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 // Register services
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
 var app = builder.Build();
 

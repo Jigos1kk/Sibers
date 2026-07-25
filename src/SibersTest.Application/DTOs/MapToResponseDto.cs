@@ -22,5 +22,19 @@ namespace SibersTest.Application.DTOs
                 UpdatedAt = project.UpdatedAt
             };
         }
+
+        public static EmployeeResponseDto MapEmployee(Employe employee)
+        {
+            return new EmployeeResponseDto
+            {
+                Id = employee.Id,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                MiddleName = employee.MiddleName,
+                Email = employee.Email,
+                ManagedProjects = employee.ManagedProjects,
+                Projects = employee.Projects
+            };
+        }
     }
 }
