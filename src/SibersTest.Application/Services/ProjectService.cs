@@ -63,9 +63,12 @@ namespace SibersTest.Application.Services
             return project;
         }
 
-        public async Task<List<Project>> ReadAsync(CancellationToken ct = default)
+        public async Task<List<Project>> ReadAsync(ProjectFilterQueryDto? filter, CancellationToken ct = default)
         {
-            return await _projectRepository.GetAllAsync(ct);
+            
+            return filter == null
+                ? await _projectRepository.GetAllAsync(ct)
+                : await _projectRepository.GetFillterAsync(filter, ct);
         }
 
         public async Task<Project> ReadAsync(int id, CancellationToken ct = default)

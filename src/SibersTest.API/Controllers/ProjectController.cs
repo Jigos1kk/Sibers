@@ -60,9 +60,9 @@ namespace SibersTest.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(List<ProjectResponseDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll(CancellationToken ct)
+        public async Task<IActionResult> GetAll(CancellationToken ct, [FromQuery] ProjectFilterQueryDto? filter)
         {
-            var projects = await _projectService.ReadAsync(ct);
+            var projects = await _projectService.ReadAsync(filter, ct);
 
             var response = projects.ConvertAll(p => MapToResponseDto.MapProject(p));
 
