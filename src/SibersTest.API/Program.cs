@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SibersTest.Application.Interfaces;
@@ -10,12 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DbConnect")));
-
-// Register FluentValidation validators
-builder.Services.AddValidatorsFromAssemblyContaining<EmployeeRequestValidator>();
 
 // Register repositories
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -27,7 +27,11 @@ builder.Services.AddScoped<IProjectTaskRepository, ProjectTaskRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IProjectTaskService, ProjectTaskService>();
->>>>>>>
+
+// Register validators
+builder.Services.AddValidatorsFromAssemblyContaining<EmployeeRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ProjectRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ProjectTaskRequestValidator>();
 
 
 var app = builder.Build();
