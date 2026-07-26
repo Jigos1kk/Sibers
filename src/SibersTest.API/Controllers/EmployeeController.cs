@@ -88,6 +88,25 @@ namespace SibersTest.API.Controllers
         }
 
         /// <summary>
+        /// Searches employees by name with partial matching.
+        /// Used for autocomplete dropdowns in the project wizard.
+        /// </summary>
+        /// <param name="term">The search term to filter employees by (matches first name, last name, or middle name).</param>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <returns>A 200 OK response with a list of matching employees.</returns>
+        /// <response code="200">Returns the list of matching employees.</response>
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(List<EmployeeResponseDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Search([FromQuery] string term, CancellationToken ct)
+        {
+            var employees = await _employeeService.SearchAsync(term, ct);
+
+            var response = employees.ConvertAll(e => MapToResponseDto.MapEmployee(e));
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Updates an existing employee's personal details.
         /// </summary>
         /// <param name="id">The unique identifier of the employee to update.</param>

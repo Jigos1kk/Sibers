@@ -77,11 +77,26 @@ export const projectsApi = {
       throw new Error(`HTTP ${res.status}: ${errorText}`);
     }
   },
+
+  async uploadDocuments(id: number, files: File[]): Promise<string[]> {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+    const res = await fetch(`${API_BASE}/project/${id}/documents`, {
+      method: 'POST',
+      body: formData,
+    });
+    return handleResponse<string[]>(res);
+  },
 };
 
 export const employeesApi = {
   async getAll(): Promise<EmployeeResponse[]> {
     const res = await fetch(`${API_BASE}/employee`);
+    return handleResponse<EmployeeResponse[]>(res);
+  },
+
+  async search(term: string): Promise<EmployeeResponse[]> {
+    const res = await fetch(`${API_BASE}/employee/search?term=${encodeURIComponent(term)}`);
     return handleResponse<EmployeeResponse[]>(res);
   },
 

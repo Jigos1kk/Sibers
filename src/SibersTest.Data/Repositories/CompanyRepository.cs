@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SibersTest.Application.Interfaces;
@@ -24,9 +25,11 @@ namespace SibersTest.Data.Repositories
 
         public async Task<Company?> GetByNameAsync(string name, CancellationToken ct)
         {
+            var normalizedName = name?.ToUpper();
+            if (string.IsNullOrEmpty(normalizedName)) return null;
+
             return await _context.Companies
-                .FirstOrDefaultAsync(c => 
-                    c.Name.ToLower() == name.ToLower(), ct);
+                .FirstOrDefaultAsync(c => c.Name.ToUpper() == normalizedName, ct);
         }
     }
 }

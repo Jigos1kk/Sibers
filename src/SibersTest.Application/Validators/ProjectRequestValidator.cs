@@ -24,7 +24,7 @@ namespace SibersTest.Application.Validators
                 .GreaterThan(x => x.StartDate).WithMessage("End date must be greater than start date.");
 
             RuleFor(x => x.Priority)
-                .InclusiveBetween(1, 10).WithMessage("Priority must be between 1 and 10.");
+                .InclusiveBetween(1, 100).WithMessage("Priority must be between 1 and 100.");
 
             RuleFor(x => x.CustomerCompanyName)
                 .NotEmpty().WithMessage("Customer name company is required.");

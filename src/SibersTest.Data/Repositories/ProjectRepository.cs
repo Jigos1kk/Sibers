@@ -99,11 +99,21 @@ namespace SibersTest.Data.Repositories
 
         /// <summary>
         /// Deletes a project from the database.
+        /// Removes all associated tasks and project-employee relationships first.
         /// </summary>
         /// <param name="project">The project entity to delete.</param>
         /// <param name="ct">Cancellation token.</param>
         public async Task DeleteAsync(Project project, CancellationToken ct)
         {
+            // Remove all tasks associated with this project first
+            var tasks = await _context.ProjectTasks
+                .Where(t => t.ProjectId == project.Id)
+                .ToListAsync(ct);
+            _context.ProjectTasks.RemoveRange(tasks);
+
+            // Clear the many-to-many relationship
+            project.Employes.Clear();
+
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync(ct);
         }

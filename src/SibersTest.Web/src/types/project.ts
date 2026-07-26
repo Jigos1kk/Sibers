@@ -90,3 +90,15 @@ export interface TaskValidationErrors {
   authorId?: string;
   assignedId?: string;
 }
+
+export interface WizardData {
+  projectName: string;
+  startDate: string;
+  endDate: string;
+  priority: number;
+  customerCompanyName: string;
+  contractorCompanyName: string;
+  managerId: number;
+  employeeIds: number[];
+  documents: File[];
+}

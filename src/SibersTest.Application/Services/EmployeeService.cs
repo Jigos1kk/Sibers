@@ -77,6 +77,17 @@ namespace SibersTest.Application.Services
         }
 
         /// <summary>
+        /// Searches employees by name (first name, last name, or middle name).
+        /// </summary>
+        /// <param name="term">The search term to filter employees by.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A list of matching <see cref="Employe"/> entities.</returns>
+        public async Task<List<Employe>> SearchAsync(string term, CancellationToken ct = default)
+        {
+            return await _employeeRepository.SearchAsync(term, ct);
+        }
+
+        /// <summary>
         /// Updates an existing employee's personal details.
         /// </summary>
         /// <param name="id">The unique identifier of the employee to update.</param>

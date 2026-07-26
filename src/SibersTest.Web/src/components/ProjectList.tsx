@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { HiPlus, HiSearch, HiChevronUp, HiChevronDown, HiSwitchVertical, HiPencil, HiTrash, HiX, HiCheck, HiExclamation, HiOutlineDocumentText, HiOutlineUserGroup, HiOutlineOfficeBuilding, HiOutlineCalendar, HiOutlineClipboardCheck } from 'react-icons/hi';
-import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters, TaskResponse, TaskRequest, TaskStatusEnum as TaskStatusType } from '../types/project';
+import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters, TaskResponse, TaskRequest } from '../types/project';
 import { TaskStatusEnum as TaskStatusValues } from '../types/project';
 import { projectsApi, employeesApi, tasksApi } from '../services/api';
 import ProjectForm from './ProjectForm';
@@ -414,13 +414,6 @@ export default function ProjectList() {
                 <HiOutlineUserGroup className="w-4 h-4" />
                 Добавить сотрудника
               </button>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                <HiPlus className="w-4 h-4" />
-                Новый проект
-              </button>
             </div>
           </div>
         </div>
@@ -608,15 +601,6 @@ export default function ProjectList() {
                 ? 'Попробуйте изменить параметры поиска'
                 : 'Создайте первый проект, чтобы начать работу'}
             </p>
-            {!searchTerm && (
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <HiPlus className="w-4 h-4" />
-                Создать проект
-              </button>
-            )}
           </div>
         )}
 

@@ -12,6 +12,7 @@ namespace SibersTest.Application.Interfaces
         Task<Employe> CreateAsync(EmployeeRequestDto request, CancellationToken ct = default);
         Task<List<Employe>> ReadAsync(CancellationToken ct = default);
         Task<Employe> ReadAsync(int id, CancellationToken ct = default);
+        Task<List<Employe>> SearchAsync(string term, CancellationToken ct = default);
         Task UpdateAsync(int id, EmployeeRequestDto request, CancellationToken ct = default);
         Task DeleteAsync(int id, CancellationToken ct = default);
     }

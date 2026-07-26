@@ -11,6 +11,7 @@ namespace SibersTest.Application.Interfaces
     {
         Task<Employe> GetByIdAsync(int id, CancellationToken ct);
         Task<List<Employe>> GetAllAsync(CancellationToken ct);
+        Task<List<Employe>> SearchAsync(string term, CancellationToken ct);
         Task AddAsync(Employe employee, CancellationToken ct);
         Task UpdateAsync(Employe employee, CancellationToken ct);
         Task DeleteAsync(Employe employee, CancellationToken ct);

@@ -46,6 +46,7 @@ namespace SibersTest.Application.Services
         public async Task<Project> CreateAsync(ProjectRequestDto request, CancellationToken ct = default)
         {
             var customer = await _companyRepository.GetByNameAsync(request.CustomerCompanyName, ct);
+            System.Console.WriteLine(customer);
             if (customer == null)
             {
                 customer = new Company { Name = request.CustomerCompanyName };
@@ -78,7 +79,7 @@ namespace SibersTest.Application.Services
 
             await _projectRepository.AddAsync(project, ct);
 
-            return project;
+            return await _projectRepository.GetByIdAsync(project.Id, ct);
         }
 
         /// <summary>

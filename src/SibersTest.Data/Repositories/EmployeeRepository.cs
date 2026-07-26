@@ -49,6 +49,20 @@ namespace SibersTest.Data.Repositories
                 ?? throw new InvalidOperationException($"Not found Employee with ID {id}");
         }
 
+        public async Task<List<Employe>> SearchAsync(string term, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return new List<Employe>();
+
+            return await _context.Employees
+                .Where(e =>
+                    e.LastName.Contains(term) ||
+                    e.FirstName.Contains(term) ||
+                    (e.MiddleName != null && e.MiddleName.Contains(term)))
+                .Take(20)
+                .ToListAsync(ct);
+        }
+
         public async Task UpdateAsync(Employe employee, CancellationToken ct)
         {
             _context.Employees.Update(employee);

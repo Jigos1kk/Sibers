@@ -17,8 +17,8 @@ namespace SibersTest.Application.DTOs
                 Priority = project.Priority,
                 CustomerCompanyName = project.Customer?.Name ?? string.Empty,
                 ContractorCompanyName = project.Contractor?.Name ?? string.Empty,
-                Manager = MapEmployee(project.Manager),
-                Employes = project.Employes.Select(e => MapEmployee(e)).ToList(),
+                Manager = project.Manager != null ? MapEmployee(project.Manager) : null!,
+                Employes = project.Employes?.Select(e => MapEmployee(e)).ToList() ?? new List<EmployeeResponseDto>(),
                 CreatedAt = project.CreatedAt,
                 UpdatedAt = project.UpdatedAt
             };
@@ -26,6 +26,9 @@ namespace SibersTest.Application.DTOs
 
         public static EmployeeResponseDto MapEmployee(Employe employee)
         {
+            if (employee == null)
+                throw new ArgumentNullException(nameof(employee));
+
             return new EmployeeResponseDto
             {
                 Id = employee.Id,
@@ -33,8 +36,6 @@ namespace SibersTest.Application.DTOs
                 LastName = employee.LastName,
                 MiddleName = employee.MiddleName,
                 Email = employee.Email,
-                // ManagedProjects = employee.ManagedProjects,
-                // Projects = employee.Projects
             };
         }
 
@@ -47,8 +48,8 @@ namespace SibersTest.Application.DTOs
                 Comment = task.Comment,
                 Priority = task.Priority,
                 Status = task.Status,
-                Author = MapEmployee(task.Author),
-                Assigned = MapEmployee(task.Assigned),
+                Author = task.Author != null ? MapEmployee(task.Author) : null!,
+                Assigned = task.Assigned != null ? MapEmployee(task.Assigned) : null!,
                 ProjectId = task.ProjectId,
                 CreatedAt = task.CreatedAt,
                 UpdatedAt = task.UpdatedAt
