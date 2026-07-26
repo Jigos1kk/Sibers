@@ -8,23 +8,33 @@ using SibersTest.Application.Interfaces;
 
 namespace SibersTest.API.Controllers
 {
+    /// <summary>
+    /// Controller responsible for managing projects.
+    /// Provides CRUD operations for project entities including creation, retrieval, update, and deletion.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectController"/> class.
+        /// </summary>
+        /// <param name="projectService">The project service for business logic operations.</param>
         public ProjectController(IProjectService projectService)
         {
             _projectService = projectService;
         }
 
         /// <summary>
-        /// Creates a new project.
+        /// Creates a new project with the specified details.
         /// </summary>
-        /// <param name="request">Project creation data.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Created project details.</returns>
+        /// <param name="request">The project creation data including name, dates, priority, companies, manager, and employees.</param>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <returns>A 201 Created response with the created project details.</returns>
+        /// <response code="201">Returns the newly created project.</response>
+        /// <response code="400">If the request data is invalid.</response>
         [HttpPost]
         [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -41,11 +51,13 @@ namespace SibersTest.API.Controllers
         }
 
         /// <summary>
-        /// Gets a project by its ID.
+        /// Retrieves a specific project by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the project.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Project details.</returns>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <returns>A 200 OK response with the project details.</returns>
+        /// <response code="200">Returns the requested project.</response>
+        /// <response code="404">If the project with the specified ID does not exist.</response>
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -58,6 +70,13 @@ namespace SibersTest.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Retrieves all projects with optional filtering and sorting.
+        /// </summary>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <param name="filter">Optional filter and sort parameters for querying projects.</param>
+        /// <returns>A 200 OK response with a list of projects.</returns>
+        /// <response code="200">Returns the list of projects.</response>
         [HttpGet]
         [ProducesResponseType(typeof(List<ProjectResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken ct, [FromQuery] ProjectFilterQueryDto? filter)
@@ -69,6 +88,16 @@ namespace SibersTest.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Updates an existing project with the specified changes.
+        /// </summary>
+        /// <param name="id">The unique identifier of the project to update.</param>
+        /// <param name="req">The updated project data.</param>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <returns>A 200 OK response if the update was successful.</returns>
+        /// <response code="200">If the project was successfully updated.</response>
+        /// <response code="404">If the project with the specified ID does not exist.</response>
+        /// <response code="400">If the request data is invalid.</response>
         [HttpPatch("{id:int}")]
         [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,6 +109,14 @@ namespace SibersTest.API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Deletes a project by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the project to delete.</param>
+        /// <param name="ct">Cancellation token to cancel the operation.</param>
+        /// <returns>A 200 OK response if the deletion was successful.</returns>
+        /// <response code="200">If the project was successfully deleted.</response>
+        /// <response code="404">If the project with the specified ID does not exist.</response>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

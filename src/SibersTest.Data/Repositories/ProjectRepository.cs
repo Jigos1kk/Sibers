@@ -10,27 +10,50 @@ using SibersTest.Domain.Enum;
 
 namespace SibersTest.Data.Repositories
 {
+    /// <summary>
+    /// Repository for managing project data persistence.
+    /// Implements CRUD operations and advanced filtering/sorting for projects.
+    /// </summary>
     public class ProjectRepository : IProjectRepository
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectRepository"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public ProjectRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Adds a new project to the database.
+        /// </summary>
+        /// <param name="project">The project entity to add.</param>
+        /// <param name="ct">Cancellation token.</param>
         public async Task AddAsync(Project project, CancellationToken ct)
         {
             await _context.Projects.AddAsync(project, ct);
             await _context.SaveChangesAsync(ct);
         }
 
+        /// <summary>
+        /// Updates an existing project in the database.
+        /// </summary>
+        /// <param name="project">The project entity with updated values.</param>
+        /// <param name="ct">Cancellation token.</param>
         public async Task UpdateAsync(Project project, CancellationToken ct)
         {
             _context.Projects.Update(project);
             await _context.SaveChangesAsync(ct);
         }
 
+        /// <summary>
+        /// Retrieves all projects with included related entities (Customer, Contractor, Manager, Employees).
+        /// </summary>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A list of all <see cref="Project"/> entities.</returns>
         public async Task<List<Project>> GetAllAsync(CancellationToken ct)
         {
             return await _context.Projects
@@ -41,6 +64,11 @@ namespace SibersTest.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Retrieves all projects with included related entities (intended for filtering scenarios).
+        /// </summary>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>A list of all <see cref="Project"/> entities.</returns>
         public async Task<List<Project>> GetAllFillterAsync(CancellationToken ct)
         {
             return await _context.Projects
@@ -51,6 +79,13 @@ namespace SibersTest.Data.Repositories
                 .ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Retrieves a specific project by its unique identifier with all related entities included.
+        /// </summary>
+        /// <param name="id">The unique identifier of the project.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The <see cref="Project"/> entity.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the project is not found.</exception>
         public async Task<Project> GetByIdAsync(int id, CancellationToken ct)
         {
             return await _context.Projects
@@ -62,12 +97,25 @@ namespace SibersTest.Data.Repositories
                 ?? throw new InvalidOperationException($"Not found project with ID {id}");
         }
 
+        /// <summary>
+        /// Deletes a project from the database.
+        /// </summary>
+        /// <param name="project">The project entity to delete.</param>
+        /// <param name="ct">Cancellation token.</param>
         public async Task DeleteAsync(Project project, CancellationToken ct)
         {
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync(ct);
         }
 
+        /// <summary>
+        /// Retrieves projects with advanced filtering and sorting capabilities.
+        /// Supports filtering by date range, priority range, customer company name, and manager ID.
+        /// Supports sorting by name, start date, end date, or priority in ascending or descending order.
+        /// </summary>
+        /// <param name="filter">The filter and sort parameters.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A filtered and sorted list of <see cref="Project"/> entities.</returns>
         public async Task<List<Project>> GetFillterAsync(ProjectFilterQueryDto filter, CancellationToken cancellationToken)
         {
             var query = _context.Projects
