@@ -1,4 +1,4 @@
-import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters } from '../types/project';
+import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters, TaskRequest, TaskResponse } from '../types/project';
 
 const API_BASE = '/api';
 
@@ -92,5 +92,49 @@ export const employeesApi = {
       body: JSON.stringify(data),
     });
     return handleResponse<EmployeeResponse>(res);
+  },
+};
+
+export const tasksApi = {
+  async getAll(projectId?: number): Promise<TaskResponse[]> {
+    const qs = projectId ? `?projectId=${projectId}` : '';
+    const res = await fetch(`${API_BASE}/projecttask${qs}`);
+    return handleResponse<TaskResponse[]>(res);
+  },
+
+  async getById(id: number): Promise<TaskResponse> {
+    const res = await fetch(`${API_BASE}/projecttask/${id}`);
+    return handleResponse<TaskResponse>(res);
+  },
+
+  async create(data: TaskRequest): Promise<TaskResponse> {
+    const res = await fetch(`${API_BASE}/projecttask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return handleResponse<TaskResponse>(res);
+  },
+
+  async update(id: number, data: TaskRequest): Promise<void> {
+    const res = await fetch(`${API_BASE}/projecttask/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
+    }
+  },
+
+  async delete(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE}/projecttask/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
+    }
   },
 };

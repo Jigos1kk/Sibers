@@ -37,5 +37,22 @@ namespace SibersTest.Application.DTOs
                 // Projects = employee.Projects
             };
         }
+
+        public static ProjectTaskResponseDto MapTask(ProjectTask task)
+        {
+            return new ProjectTaskResponseDto
+            {
+                Id = task.Id,
+                Name = task.Name,
+                Comment = task.Comment,
+                Priority = task.Priority,
+                Status = task.Status,
+                Author = MapEmployee(task.Author),
+                Assigned = MapEmployee(task.Assigned),
+                ProjectId = task.ProjectId,
+                CreatedAt = task.CreatedAt,
+                UpdatedAt = task.UpdatedAt
+            };
+        }
     }
 }

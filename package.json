@@ -1,0 +1,25 @@
+{
+  "name": "sibers_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "concurrently \"dotnet run --project src/Sibers.API\" \"npm run dev --prefix src/Sibers.Web\"",
+    "build": "dotnet build && npm run build --prefix src/Sibers.Web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jigos1kk/Sibers.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jigos1kk/Sibers/issues"
+  },
+  "homepage": "https://github.com/Jigos1kk/Sibers#readme"
+}

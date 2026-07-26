@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { HiX } from 'react-icons/hi';
 
 interface ModalProps {
   isOpen: boolean;
@@ -59,9 +60,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
             className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
             aria-label="Закрыть"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <HiX className="w-5 h-5" />
           </button>
         </div>
 

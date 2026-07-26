@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { HiPlus, HiSearch, HiChevronUp, HiChevronDown, HiSwitchVertical, HiPencil, HiTrash, HiX, HiCheck, HiExclamation, HiOutlineDocumentText, HiOutlineUserGroup, HiOutlineOfficeBuilding, HiOutlineCalendar } from 'react-icons/hi';
-import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters } from '../types/project';
-import { projectsApi, employeesApi } from '../services/api';
+import { HiPlus, HiSearch, HiChevronUp, HiChevronDown, HiSwitchVertical, HiPencil, HiTrash, HiX, HiCheck, HiExclamation, HiOutlineDocumentText, HiOutlineUserGroup, HiOutlineOfficeBuilding, HiOutlineCalendar, HiOutlineClipboardCheck } from 'react-icons/hi';
+import type { ProjectResponse, ProjectRequest, EmployeeResponse, ProjectFilters, TaskResponse, TaskRequest, TaskStatusEnum as TaskStatusType } from '../types/project';
+import { TaskStatusEnum as TaskStatusValues } from '../types/project';
+import { projectsApi, employeesApi, tasksApi } from '../services/api';
 import ProjectForm from './ProjectForm';
 import EmployeeForm from './EmployeeForm';
+import TaskForm from './TaskForm';
 import Modal from './Modal';
 
 type SortField = 'startDate' | 'endDate' | 'priority' | 'name';
@@ -30,6 +32,15 @@ export default function ProjectList() {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [selectedProject, setSelectedProject] = useState<ProjectResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Task state
+  const [tasks, setTasks] = useState<TaskResponse[]>([]);
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<TaskResponse | null>(null);
+  const [isTaskViewModalOpen, setIsTaskViewModalOpen] = useState(false);
 
   // Filters state
   const [filters, setFilters] = useState<ProjectFilters>({
@@ -204,9 +215,19 @@ export default function ProjectList() {
     setTimeout(() => setIsEditModalOpen(true), 50);
   };
 
+  const fetchTasks = useCallback(async (projectId: number) => {
+    try {
+      const data = await tasksApi.getAll(projectId);
+      setTasks(data);
+    } catch {
+      setTasks([]);
+    }
+  }, []);
+
   const openViewModal = (project: ProjectResponse) => {
     setSelectedProject(project);
     setIsViewModalOpen(true);
+    fetchTasks(project.id);
   };
 
   const openDeleteConfirm = (project: ProjectResponse) => {
@@ -257,6 +278,100 @@ export default function ProjectList() {
     if (priority >= 70) return 'Высокий';
     if (priority >= 40) return 'Средний';
     return 'Низкий';
+  };
+
+  const handleCreateTask = async (data: TaskRequest) => {
+    try {
+      setIsSubmitting(true);
+      await tasksApi.create(data);
+      setIsCreateTaskModalOpen(false);
+      showNotification('Задача успешно создана', 'success');
+      if (selectedProject) fetchTasks(selectedProject.id);
+    } catch (err) {
+      showNotification(
+        err instanceof Error ? err.message : 'Ошибка при создании задачи',
+        'error'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateTask = async (data: TaskRequest) => {
+    if (!selectedTask) return;
+    try {
+      setIsSubmitting(true);
+      await tasksApi.update(selectedTask.id, data);
+      setIsEditTaskModalOpen(false);
+      setSelectedTask(null);
+      showNotification('Задача успешно обновлена', 'success');
+      if (selectedProject) fetchTasks(selectedProject.id);
+    } catch (err) {
+      showNotification(
+        err instanceof Error ? err.message : 'Ошибка при обновлении задачи',
+        'error'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    if (!taskToDelete) return;
+    try {
+      setIsSubmitting(true);
+      await tasksApi.delete(taskToDelete.id);
+      setIsDeleteTaskModalOpen(false);
+      setTaskToDelete(null);
+      showNotification('Задача успешно удалена', 'success');
+      if (selectedProject) fetchTasks(selectedProject.id);
+    } catch (err) {
+      showNotification(
+        err instanceof Error ? err.message : 'Ошибка при удалении задачи',
+        'error'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditTaskModal = (task: TaskResponse) => {
+    setSelectedTask(task);
+    setIsTaskViewModalOpen(false);
+    setTimeout(() => setIsEditTaskModalOpen(true), 50);
+  };
+
+  const openDeleteTaskConfirm = (task: TaskResponse) => {
+    setTaskToDelete(task);
+    setIsDeleteTaskModalOpen(true);
+  };
+
+  const getEditTaskFormData = (task: TaskResponse): TaskRequest => ({
+    name: task.name,
+    comment: task.comment || '',
+    priority: task.priority,
+    status: task.status,
+    authorId: task.author.id,
+    assignedId: task.assigned.id,
+    projectId: task.projectId,
+  });
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case TaskStatusValues.ToDo: return 'К выполнению';
+      case TaskStatusValues.Progress: return 'В работе';
+      case TaskStatusValues.Done: return 'Выполнено';
+      default: return status;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case TaskStatusValues.ToDo: return 'bg-gray-100 text-gray-700';
+      case TaskStatusValues.Progress: return 'bg-blue-100 text-blue-700';
+      case TaskStatusValues.Done: return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
   };
 
   const filterInputClass = "w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400";
@@ -657,9 +772,18 @@ export default function ProjectList() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                Сотрудники проекта ({selectedProject.employes.length})
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Сотрудники проекта ({selectedProject.employes.length})
+                </label>
+                <button
+                  onClick={() => openEditModal(selectedProject)}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <HiPlus className="w-3.5 h-3.5" />
+                  Добавить сотрудника
+                </button>
+              </div>
               {selectedProject.employes.length === 0 ? (
                 <p className="text-sm text-gray-400">Нет назначенных сотрудников</p>
               ) : (
@@ -674,6 +798,51 @@ export default function ProjectList() {
                           {emp.lastName} {emp.firstName} {emp.middleName || ''}
                         </p>
                         <p className="text-xs text-gray-500">{emp.email}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Tasks Section */}
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Задачи проекта ({tasks.length})
+                </label>
+                <button
+                  onClick={() => setIsCreateTaskModalOpen(true)}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <HiPlus className="w-3.5 h-3.5" />
+                  Добавить задачу
+                </button>
+              </div>
+              {tasks.length === 0 ? (
+                <p className="text-sm text-gray-400">Нет задач</p>
+              ) : (
+                <div className="space-y-2">
+                  {tasks.map(task => (
+                    <div
+                      key={task.id}
+                      className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      onClick={() => { setSelectedTask(task); setIsTaskViewModalOpen(true); }}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <HiOutlineClipboardCheck className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{task.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {task.author.lastName} {task.author.firstName[0]}. → {task.assigned.lastName} {task.assigned.firstName[0]}.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                          {getStatusLabel(task.status)}
+                        </span>
+                        <span className="text-xs text-gray-400">#{task.priority}</span>
                       </div>
                     </div>
                   ))}
@@ -743,6 +912,133 @@ export default function ProjectList() {
           onCancel={() => setIsEmployeeModalOpen(false)}
           isSubmitting={isSubmitting}
         />
+      </Modal>
+
+      {/* Create Task Modal */}
+      <Modal isOpen={isCreateTaskModalOpen} onClose={() => setIsCreateTaskModalOpen(false)} title="Создание задачи" size="lg">
+        {selectedProject && (
+          <TaskForm
+            employees={selectedProject.employes}
+            projectId={selectedProject.id}
+            onSubmit={handleCreateTask}
+            onCancel={() => setIsCreateTaskModalOpen(false)}
+            isSubmitting={isSubmitting}
+          />
+        )}
+      </Modal>
+
+      {/* Edit Task Modal */}
+      <Modal isOpen={isEditTaskModalOpen} onClose={() => { setIsEditTaskModalOpen(false); setSelectedTask(null); }} title="Редактирование задачи" size="lg">
+        {selectedTask && selectedProject && (
+          <TaskForm
+            initialData={getEditTaskFormData(selectedTask)}
+            employees={selectedProject.employes}
+            projectId={selectedTask.projectId}
+            onSubmit={handleUpdateTask}
+            onCancel={() => { setIsEditTaskModalOpen(false); setSelectedTask(null); }}
+            isSubmitting={isSubmitting}
+          />
+        )}
+      </Modal>
+
+      {/* View Task Modal */}
+      <Modal isOpen={isTaskViewModalOpen} onClose={() => { setIsTaskViewModalOpen(false); setSelectedTask(null); }} title="Детали задачи" size="md">
+        {selectedTask && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Название</label>
+              <p className="text-sm font-medium text-gray-900">{selectedTask.name}</p>
+            </div>
+            {selectedTask.comment && (
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Комментарий</label>
+                <p className="text-sm text-gray-700">{selectedTask.comment}</p>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Статус</label>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedTask.status)}`}>
+                  {getStatusLabel(selectedTask.status)}
+                </span>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Приоритет</label>
+                <p className="text-sm text-gray-900">{selectedTask.priority}</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Автор</label>
+                <p className="text-sm text-gray-900">
+                  {selectedTask.author.lastName} {selectedTask.author.firstName} {selectedTask.author.middleName || ''}
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Исполнитель</label>
+                <p className="text-sm text-gray-900">
+                  {selectedTask.assigned.lastName} {selectedTask.assigned.firstName} {selectedTask.assigned.middleName || ''}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+              <button
+                onClick={() => openEditTaskModal(selectedTask)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <HiPencil className="w-4 h-4" />
+                Редактировать
+              </button>
+              <button
+                onClick={() => openDeleteTaskConfirm(selectedTask)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <HiTrash className="w-4 h-4" />
+                Удалить
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Delete Task Confirmation Modal */}
+      <Modal isOpen={isDeleteTaskModalOpen} onClose={() => { setIsDeleteTaskModalOpen(false); setTaskToDelete(null); }} title="Подтверждение удаления" size="sm">
+        {taskToDelete && (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <HiExclamation className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-700">
+                  Вы уверены, что хотите удалить задачу <strong>«{taskToDelete.name}»</strong>?
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Это действие нельзя отменить.</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => { setIsDeleteTaskModalOpen(false); setTaskToDelete(null); }}
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={handleDeleteTask}
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting && (
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+                <HiTrash className="w-4 h-4" />
+                Удалить
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

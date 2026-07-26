@@ -52,3 +52,41 @@ export interface ProjectValidationErrors {
   contractorCompanyName?: string;
   managerId?: string;
 }
+
+export const TaskStatusEnum = {
+  ToDo: 'ToDo',
+  Progress: 'Progress',
+  Done: 'Done',
+} as const;
+
+export type TaskStatusEnum = (typeof TaskStatusEnum)[keyof typeof TaskStatusEnum];
+
+export interface TaskResponse {
+  id: number;
+  name: string;
+  comment?: string;
+  priority: number;
+  status: TaskStatusEnum;
+  author: EmployeeResponse;
+  assigned: EmployeeResponse;
+  projectId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskRequest {
+  name: string;
+  comment?: string;
+  priority: number;
+  status: TaskStatusEnum;
+  authorId: number;
+  assignedId: number;
+  projectId: number;
+}
+
+export interface TaskValidationErrors {
+  name?: string;
+  priority?: string;
+  authorId?: string;
+  assignedId?: string;
+}
