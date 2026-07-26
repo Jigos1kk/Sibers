@@ -102,7 +102,7 @@ namespace SibersTest.Application.Services
             var contractor = await _companyRepository.GetByNameAsync(request.ContractorCompanyName, ct);
             if (contractor == null)
             {
-                contractor = new Company { Name = request.CustomerCompanyName };
+                contractor = new Company { Name = request.ContractorCompanyName };
                 await _companyRepository.AddAsync(contractor, ct);
             }
             project.ContractorId = contractor.Id;

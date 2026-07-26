@@ -74,6 +74,7 @@ namespace SibersTest.Data.Repositories
                 .Include(p => p.Customer)
                 .Include(p => p.Contractor)
                 .Include(p => p.Manager)
+                .Include(p => p.Employes)
                 .AsQueryable();
 
             if (filter.StartDateFrom.HasValue)
