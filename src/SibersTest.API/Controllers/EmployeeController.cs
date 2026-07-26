@@ -59,7 +59,7 @@ namespace SibersTest.API.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<EmployeeResponseDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
             var employee = await _employeeService.ReadAsync(ct);

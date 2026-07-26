@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq;
 using SibersTest.Domain.Entities;
 
@@ -16,8 +17,8 @@ namespace SibersTest.Application.DTOs
                 Priority = project.Priority,
                 CustomerCompanyName = project.Customer?.Name ?? string.Empty,
                 ContractorCompanyName = project.Contractor?.Name ?? string.Empty,
-                Manager = project.Manager,
-                Employes = project.Employes,
+                Manager = MapEmployee(project.Manager),
+                Employes = project.Employes.Select(e => MapEmployee(e)).ToList(),
                 CreatedAt = project.CreatedAt,
                 UpdatedAt = project.UpdatedAt
             };
@@ -32,8 +33,8 @@ namespace SibersTest.Application.DTOs
                 LastName = employee.LastName,
                 MiddleName = employee.MiddleName,
                 Email = employee.Email,
-                ManagedProjects = employee.ManagedProjects,
-                Projects = employee.Projects
+                // ManagedProjects = employee.ManagedProjects,
+                // Projects = employee.Projects
             };
         }
     }

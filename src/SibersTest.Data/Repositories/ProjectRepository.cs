@@ -23,7 +23,7 @@ namespace SibersTest.Data.Repositories
             await _context.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteAsync(Project project, CancellationToken ct)
+        public async Task UpdateAsync(Project project, CancellationToken ct)
         {
             _context.Projects.Update(project);
             await _context.SaveChangesAsync(ct);
@@ -50,7 +50,7 @@ namespace SibersTest.Data.Repositories
                 ?? throw new InvalidOperationException($"Not found project with ID {id}");
         }
 
-        public async Task UpdateAsync(Project project, CancellationToken ct)
+        public async Task DeleteAsync(Project project, CancellationToken ct)
         {
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync(ct);

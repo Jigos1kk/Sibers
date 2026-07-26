@@ -13,6 +13,6 @@ namespace SibersTest.Application.Interfaces
         Task<List<Project>> ReadAsync(CancellationToken ct = default);
         Task<Project> ReadAsync(int id, CancellationToken ct = default);
         Task UpdateAsync(int id, ProjectRequestDto request, CancellationToken ct = default);
-        Task UpdateAsync(int id, CancellationToken ct = default);
+        Task DeleteAsync(int id, CancellationToken ct = default);
     }
 }

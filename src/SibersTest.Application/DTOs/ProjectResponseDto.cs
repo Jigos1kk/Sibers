@@ -13,8 +13,8 @@ namespace SibersTest.Application.DTOs
         public int Priority { get; set; }
         public string CustomerCompanyName { get; set; } = string.Empty;
         public string ContractorCompanyName { get; set; } = string.Empty;
-        public Employe Manager { get; set; } = null!;
-        public ICollection<Employe> Employes { get; set; } = new List<Employe>();
+        public EmployeeResponseDto Manager { get; set; } = null!;
+        public List<EmployeeResponseDto> Employes { get; set; } = new List<EmployeeResponseDto>();
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

@@ -54,7 +54,8 @@ namespace SibersTest.Application.Services
 
             foreach (var employeeId in request.EmployeeIds)
             {
-                project.Employes.Add(new Employe { Id = employeeId });
+                var employee = await _employeeRepository.GetByIdAsync(employeeId, ct);
+                project.Employes.Add(employee);
             }
 
             await _projectRepository.AddAsync(project, ct);
@@ -72,14 +73,56 @@ namespace SibersTest.Application.Services
             return await _projectRepository.GetByIdAsync(id, ct);
         }
 
-        public Task UpdateAsync(int id, ProjectRequestDto request, CancellationToken ct = default)
+        public async Task UpdateAsync(int id, ProjectRequestDto request, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var project = await _projectRepository.GetByIdAsync(id, ct);
+
+            if (project == null)
+            {
+                throw new KeyNotFoundException($"Project with ID {id} not found.");
+            }
+
+            project.Name = request.ProjectName;
+            project.StartDate = request.StartDate;
+            project.EndDate = request.EndDate;
+            project.Priority = request.Priority;
+            project.ManagerId = request.ManagerId;
+
+            var customer = await _companyRepository.GetByNameAsync(request.CustomerCompanyName, ct);
+            if (customer == null)
+            {
+                customer = new Company { Name = request.CustomerCompanyName };
+                await _companyRepository.AddAsync(customer, ct);
+            }
+            project.CustomerId = customer.Id;
+
+            var contractor = await _companyRepository.GetByNameAsync(request.ContractorCompanyName, ct);
+            if (contractor == null)
+            {
+                contractor = new Company { Name = request.CustomerCompanyName };
+                await _companyRepository.AddAsync(contractor, ct);
+            }
+            project.ContractorId = contractor.Id;
+
+            project.Employes.Clear();
+
+            foreach (var employeeId in request.EmployeeIds)
+            {
+                var employee = await _employeeRepository.GetByIdAsync(employeeId, ct);
+                project.Employes.Add(employee);
+            }
+
+            await _projectRepository.UpdateAsync(project, ct);
         }
 
-        public Task UpdateAsync(int id, CancellationToken ct = default)
+        public async Task DeleteAsync(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var project = await _projectRepository.GetByIdAsync(id, ct);
+            
+            if (project == null)
+                throw new KeyNotFoundException($"Project with ID {id} not found.");
+
+            await _projectRepository.DeleteAsync(project, ct);
         }
     }
 }

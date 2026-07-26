@@ -58,5 +58,36 @@ namespace SibersTest.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(List<ProjectResponseDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            var projects = await _projectService.ReadAsync(ct);
+
+            var response = projects.ConvertAll(p => MapToResponseDto.MapProject(p));
+
+            return Ok(response);
+        }
+
+        [HttpPatch("{id:int}")]
+        [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(int id, [FromBody] ProjectRequestDto req, CancellationToken ct)
+        {
+            await _projectService.UpdateAsync(id, req, ct);
+
+            return Ok();
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(typeof(ProjectResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            await _projectService.DeleteAsync(id, ct);
+
+            return Ok();
+        }
     }
 }
