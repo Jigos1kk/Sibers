@@ -48,14 +48,29 @@ namespace SibersTest.Application.Services
             return await _employeeRepository.GetByIdAsync(id, ct);
         }
 
-        public Task UpdateAsync(int id, EmployeeRequestDto request, CancellationToken ct = default)
+        public async Task UpdateAsync(int id, EmployeeRequestDto request, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var employee = await _employeeRepository.GetByIdAsync(id, ct);
+
+            if (employee == null)
+                throw new KeyNotFoundException($"Employee with ID {id} not found.");
+
+            employee.FirstName = request.FirstName;
+            employee.LastName = request.LastName;
+            employee.MiddleName = request.MiddleName;
+            employee.Email = request.Email;
+
+            await _employeeRepository.UpdateAsync(employee, ct);
         }
 
-        public Task UpdateAsync(int id, CancellationToken ct = default)
+        public async Task DeleteAsync(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var employee = await _employeeRepository.GetByIdAsync(id, ct);
+
+            if (employee == null)
+                throw new KeyNotFoundException($"Employee with ID {id} not found.");
+            
+            await _employeeRepository.DeleteAsync(employee, ct);
         }
     }
 }

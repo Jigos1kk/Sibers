@@ -28,9 +28,9 @@ namespace SibersTest.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] EmployeeRequestDto request, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] EmployeeRequestDto req, CancellationToken ct)
         {
-            var employee = await _employeeService.CreateAsync(request, ct);
+            var employee = await _employeeService.CreateAsync(req, ct);
 
             var response = MapToResponseDto.MapEmployee(employee);
 
@@ -56,6 +56,38 @@ namespace SibersTest.API.Controllers
             var response = MapToResponseDto.MapEmployee(employee);
 
             return Ok(response);
-        }   
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            var employee = await _employeeService.ReadAsync(ct);
+
+            var response = employee.ConvertAll(e => MapToResponseDto.MapEmployee(e));
+
+            return Ok(response);
+        }
+
+        [HttpPatch("{id:int}")]
+        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(int id, [FromBody] EmployeeRequestDto req, CancellationToken ct)
+        {
+            await _employeeService.UpdateAsync(id, req, ct);
+
+            return Ok();
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(typeof(EmployeeResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            await _employeeService.DeleteAsync(id, ct);
+
+            return Ok();
+        }
     }
 }
