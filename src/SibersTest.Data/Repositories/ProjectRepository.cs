@@ -14,59 +14,10 @@ namespace SibersTest.Data.Repositories
     /// Repository for managing project data persistence.
     /// Implements CRUD operations and advanced filtering/sorting for projects.
     /// </summary>
-    public class ProjectRepository : IProjectRepository
+    public class ProjectRepository : BaseRepository<Project>, IProjectRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProjectRepository(ApplicationDbContext context)
+        public ProjectRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
-        }
-
-        private IQueryable<Project> GetQueryWithIncludes()
-        {
-            return _context.Projects
-                .Include(p => p.Customer)
-                .Include(p => p.Contractor)
-                .Include(p => p.Manager)
-                .Include(p => p.Employes);
-        }
-
-        public async Task AddAsync(Project project, CancellationToken ct)
-        {
-            await _context.Projects.AddAsync(project, ct);
-        }
-
-        public async Task UpdateAsync(Project project, CancellationToken ct)
-        {
-            _context.Projects.Update(project);
-            await Task.CompletedTask;
-        }
-
-        public async Task<List<Project>> GetAllAsync(CancellationToken ct)
-        {
-            return await GetQueryWithIncludes().ToListAsync(ct);
-        }
-
-        public async Task<Project> GetByIdAsync(int id, CancellationToken ct)
-        {
-            return await GetQueryWithIncludes()
-                .FirstOrDefaultAsync(p => p.Id == id, ct)
-                ?? throw new InvalidOperationException($"Not found project with ID {id}");
-        }
-
-        public async Task DeleteAsync(Project project, CancellationToken ct)
-        {
-            // Remove all tasks associated with this project first
-            var tasks = await _context.ProjectTasks
-                .Where(t => t.ProjectId == project.Id)
-                .ToListAsync(ct);
-            _context.ProjectTasks.RemoveRange(tasks);
-
-            // Clear the many-to-many relationship
-            project.Employes.Clear();
-
-            _context.Projects.Remove(project);
         }
 
         /// <summary>
@@ -76,7 +27,12 @@ namespace SibersTest.Data.Repositories
         /// </summary>
         public async Task<List<Project>> GetFilteredAsync(ProjectFilterQueryDto filter, CancellationToken cancellationToken)
         {
-            var query = GetQueryWithIncludes().AsQueryable();
+            var query = _dbSet
+                .Include(p => p.Customer)
+                .Include(p => p.Contractor)
+                .Include(p => p.Manager)
+                .Include(p => p.Employes)
+                .AsQueryable();
 
             if (filter.StartDateFrom.HasValue)
             {

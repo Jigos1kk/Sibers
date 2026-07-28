@@ -33,6 +33,9 @@ namespace SibersTest.Application.DTOs
         /// </summary>
         public string? CustomerCompanyName { get; set; }
 
+        /// <summary>
+        /// Filter: Exact or partial match for contractor company name.
+        /// </summary>
         public string? ContractorCompanyName { get; set; }
 
         /// <summary>

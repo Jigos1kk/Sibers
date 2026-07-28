@@ -40,7 +40,16 @@ namespace SibersTest.Data
             {
                 if (_transaction != null)
                 {
-                    await _transaction.RollbackAsync(ct);
+                    var transaction = _transaction;
+                    _transaction = null;
+                    try
+                    {
+                        await transaction.DisposeAsync();
+                    }
+                    catch
+                    {
+                        // Ignore dispose errors to prevent masking the original exception
+                    }
                 }
                 throw;
             }
@@ -50,7 +59,19 @@ namespace SibersTest.Data
         {
             if (_transaction != null)
             {
-                await _transaction.RollbackAsync(ct);
+                try
+                {
+                    await _transaction.RollbackAsync(ct);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Transaction may have already been completed (rolled back by EF Core or committed).
+                }
+                finally
+                {
+                    await _transaction.DisposeAsync();
+                    _transaction = null;
+                }
             }
         }
 
@@ -62,6 +83,7 @@ namespace SibersTest.Data
         public void Dispose()
         {
             _transaction?.Dispose();
+            _transaction = null;
         }
     }
 }

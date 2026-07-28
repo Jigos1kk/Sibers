@@ -31,7 +31,6 @@ export default function EmployeeAutocomplete({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load selected employee name if value is set
   useEffect(() => {
     if (value && !selectedEmployee) {
       employeesApi.getAll().then(all => {
@@ -44,7 +43,6 @@ export default function EmployeeAutocomplete({
     }
   }, [value, selectedEmployee]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {

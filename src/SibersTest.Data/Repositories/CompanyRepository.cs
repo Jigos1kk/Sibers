@@ -8,18 +8,10 @@ using SibersTest.Domain.Entities;
 
 namespace SibersTest.Data.Repositories
 {
-    public class CompanyRepository : ICompanyRepository
+    public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public CompanyRepository(ApplicationDbContext context)
+        public CompanyRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
-        }
-
-        public async Task AddAsync(Company company, CancellationToken ct)
-        {
-            await _context.Companies.AddAsync(company, ct);
         }
 
         public async Task<Company?> GetByNameAsync(string name, CancellationToken ct)
@@ -27,7 +19,7 @@ namespace SibersTest.Data.Repositories
             var normalizedName = name?.ToUpper();
             if (string.IsNullOrEmpty(normalizedName)) return null;
 
-            return await _context.Companies
+            return await _dbSet
                 .FirstOrDefaultAsync(c => c.Name.ToUpper() == normalizedName, ct);
         }
     }

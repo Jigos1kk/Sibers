@@ -14,7 +14,7 @@ namespace SibersTest.API.Controllers
     /// and keep API interaction concerns isolated.
     /// </summary>
     [ApiController]
-    [Route("api/projects/{id:int}/documents")]
+    [Route("api/project/{id:int}/document")]
     public class DocumentsController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;

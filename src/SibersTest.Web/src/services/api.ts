@@ -81,7 +81,7 @@ export const projectsApi = {
   async uploadDocuments(id: number, files: File[]): Promise<string[]> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
-    const res = await fetch(`${API_BASE}/project/${id}/documents`, {
+    const res = await fetch(`${API_BASE}/project/${id}/document`, {
       method: 'POST',
       body: formData,
     });

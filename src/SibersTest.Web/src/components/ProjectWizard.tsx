@@ -376,7 +376,6 @@ export default function ProjectWizard({ onClose, onSuccess }: ProjectWizardProps
   );
 }
 
-// Helper component to display selected employee
 function EmployeeBadge({ employeeId, onRemove }: { employeeId: number; onRemove: () => void }) {
   const [employee, setEmployee] = useState<{ lastName: string; firstName: string; middleName?: string; email: string } | null>(null);
 
