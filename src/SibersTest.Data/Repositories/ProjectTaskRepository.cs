@@ -20,13 +20,12 @@ namespace SibersTest.Data.Repositories
         public async Task AddAsync(ProjectTask task, CancellationToken ct)
         {
             await _context.ProjectTasks.AddAsync(task, ct);
-            await _context.SaveChangesAsync(ct);
         }
 
-        public async Task UpdateAsync(ProjectTask task, CancellationToken ct)
+        public Task UpdateAsync(ProjectTask task, CancellationToken ct)
         {
             _context.ProjectTasks.Update(task);
-            await _context.SaveChangesAsync(ct);
+            return Task.CompletedTask;
         }
 
         public async Task<List<ProjectTask>> GetAllAsync(CancellationToken ct)
@@ -57,10 +56,10 @@ namespace SibersTest.Data.Repositories
                 ?? throw new InvalidOperationException($"Not found task with ID {id}");
         }
 
-        public async Task DeleteAsync(ProjectTask task, CancellationToken ct)
+        public Task DeleteAsync(ProjectTask task, CancellationToken ct)
         {
             _context.ProjectTasks.Remove(task);
-            await _context.SaveChangesAsync(ct);
+            return Task.CompletedTask;
         }
     }
 }

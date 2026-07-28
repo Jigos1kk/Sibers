@@ -19,13 +19,12 @@ namespace SibersTest.Data.Repositories
         public async Task AddAsync(Employe employee, CancellationToken ct)
         {
             await _context.Employees.AddAsync(employee, ct);
-            await _context.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteAsync(Employe employee, CancellationToken ct)
+        public Task DeleteAsync(Employe employee, CancellationToken ct)
         {
             _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync(ct);
+            return Task.CompletedTask;
         }
 
         public async Task<List<Employe>> GetAllAsync(CancellationToken ct)
@@ -63,10 +62,10 @@ namespace SibersTest.Data.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task UpdateAsync(Employe employee, CancellationToken ct)
+        public Task UpdateAsync(Employe employee, CancellationToken ct)
         {
             _context.Employees.Update(employee);
-            await _context.SaveChangesAsync(ct);
+            return Task.CompletedTask;
         }
     }
 }

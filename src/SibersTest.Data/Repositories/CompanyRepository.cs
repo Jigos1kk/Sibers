@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SibersTest.Application.Interfaces;
@@ -17,10 +16,10 @@ namespace SibersTest.Data.Repositories
         {
             _context = context;
         }
+
         public async Task AddAsync(Company company, CancellationToken ct)
         {
             await _context.Companies.AddAsync(company, ct);
-            await _context.SaveChangesAsync(ct);
         }
 
         public async Task<Company?> GetByNameAsync(string name, CancellationToken ct)

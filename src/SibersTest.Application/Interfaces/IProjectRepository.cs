@@ -11,7 +11,7 @@ namespace SibersTest.Application.Interfaces
     {
         Task<Project> GetByIdAsync(int id, CancellationToken ct);
         Task<List<Project>> GetAllAsync(CancellationToken ct);
-        Task<List<Project>> GetFillterAsync(ProjectFilterQueryDto filter, CancellationToken ct);
+        Task<List<Project>> GetFilteredAsync(ProjectFilterQueryDto filter, CancellationToken ct);
         Task AddAsync(Project project, CancellationToken ct);
         Task UpdateAsync(Project project, CancellationToken ct);
         Task DeleteAsync(Project project, CancellationToken ct);

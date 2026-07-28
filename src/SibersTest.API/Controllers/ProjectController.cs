@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using SibersTest.Application.DTOs;
 using SibersTest.Application.Interfaces;
@@ -19,56 +17,14 @@ namespace SibersTest.API.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
-        private readonly IWebHostEnvironment _env;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProjectController"/> class.
         /// </summary>
         /// <param name="projectService">The project service for business logic operations.</param>
-        /// <param name="env">The web host environment for file storage paths.</param>
-        public ProjectController(IProjectService projectService, IWebHostEnvironment env)
+        public ProjectController(IProjectService projectService)
         {
             _projectService = projectService;
-            _env = env;
-        }
-        /// <summary>
-        /// Uploads documents for a specific project.
-        /// </summary>
-        /// <param name="id">The unique identifier of the project.</param>
-        /// <param name="files">The files to upload.</param>
-        /// <param name="ct">Cancellation token to cancel the operation.</param>
-        /// <returns>A 200 OK response with the list of uploaded file names.</returns>
-        /// <response code="200">Returns the list of uploaded file names.</response>
-        /// <response code="400">If no files are provided.</response>
-        [HttpPost("{id:int}/documents")]
-        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UploadDocuments(int id, [FromForm] List<IFormFile> files, CancellationToken ct)
-        {
-            if (files == null || files.Count == 0)
-                return BadRequest("No files provided.");
-
-            var uploadsDir = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", $"project_{id}");
-            Directory.CreateDirectory(uploadsDir);
-
-            var uploadedFiles = new List<string>();
-
-            foreach (var file in files)
-            {
-                if (file.Length == 0) continue;
-
-                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-                var filePath = Path.Combine(uploadsDir, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream, ct);
-                }
-
-                uploadedFiles.Add(fileName);
-            }
-
-            return Ok(uploadedFiles);
         }
 
         /// <summary>
